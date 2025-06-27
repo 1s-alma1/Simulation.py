@@ -18,13 +18,26 @@ heure = st.slider("\ud83d\udd52 Heure de la journée", 6, 18, 12)
 meteo = st.radio("\ud83c\udf27\ufe0f Conditions météo", ["Ensoleillé", "Nuageux", "Pluvieux"])
 nb_panneaux = st.slider("\ud83d\udd22 Nombre de panneaux", 0, 25, 20)
 
-# --- DONNÉES BASES ---
-surface_par_module = 1.7
-puissance_par_panneau = 0.4
-puissance_kWp = nb_panneaux * puissance_par_panneau
-puissance_kWp_ref = 8
-surface_totale = nb_panneaux * surface_par_module
-facteur_meteo = {"Ensoleillé": 1.0, "Nuageux": 0.75, "Pluvieux": 0.55}[meteo]
+# --- DONNÉES PAR VILLE (latitude et irradiation annuelle en kWh/m2) ---
+villes_data = {
+    "Marseille": {"lat": 43.3, "irradiation": 1824},
+    "Nice": {"lat": 43.7, "irradiation": 1800},
+    "Paris": {"lat": 48.9, "irradiation": 1400},
+    "Lille": {"lat": 50.6, "irradiation": 1300},
+    "Metz": {"lat": 49.1, "irradiation": 1350},
+    "Nancy": {"lat": 48.7, "irradiation": 1360},
+    "Colmar": {"lat": 48.1, "irradiation": 1400},
+    "Strasbourg": {"lat": 48.6, "irradiation": 1380},
+    "Toulouse": {"lat": 43.6, "irradiation": 1650},
+    "Lyon": {"lat": 45.8, "irradiation": 1600},
+    "Bordeaux": {"lat": 44.8, "irradiation": 1550}
+}
+
+latitude = villes_data[ville]["lat"]
+irradiation = villes_data[ville]["irradiation"]
+declinaison = 23.45 * math.sin(math.radians(360 / 12 * (mois - 2)))
+hauteur_midi = 90 - latitude + declinaison
+hauteur_soleil = max(0, hauteur_midi * math.sin(math.pi * (heure - 6) / 12))
 
 # --- DONNÉES PAR PANNEAU ---
 data = {
@@ -38,13 +51,13 @@ rendement = data[panneau]["rendement"]
 prod_ref = data[panneau]["prod_ref"]
 prix_watt = data[panneau]["prix"]
 
-# --- HAUTEUR DU SOLEIL (simple) ---
-dict_hauteur_soleil = {
-    1: 26, 2: 34, 3: 45, 4: 55, 5: 64, 6: 69,
-    7: 67, 8: 60, 9: 50, 10: 39, 11: 30, 12: 25
-}
-hauteur_midi = dict_hauteur_soleil[mois]
-hauteur_soleil = hauteur_midi * math.sin(math.pi * (heure - 6) / 12)
+# --- DONNÉES GÉNÉRALES ---
+surface_par_module = 1.7
+puissance_par_panneau = 0.4
+puissance_kWp = nb_panneaux * puissance_par_panneau
+puissance_kWp_ref = 8
+surface_totale = nb_panneaux * surface_par_module
+facteur_meteo = {"Ensoleillé": 1.0, "Nuageux": 0.75, "Pluvieux": 0.55}[meteo]
 
 # --- OBSTACLE FIXE ---
 hauteur_obstacle = 8
@@ -58,7 +71,7 @@ else:
     perte_ombrage = 0
 
 # --- PRODUCTION ---
-production = (puissance_kWp / puissance_kWp_ref) * prod_ref * facteur_meteo
+production = (puissance_kWp / puissance_kWp_ref) * prod_ref * (irradiation / 1824) * facteur_meteo
 production_corrigee = production * (1 - perte_ombrage / 100)
 efficacite = production_corrigee / surface_totale if surface_totale else 0
 cout_total = puissance_kWp * 1000 * prix_watt
@@ -117,3 +130,4 @@ st.pyplot(fig2)
 st.markdown("---")
 st.markdown("**\ud83d\udc69\u200d\ud83c\udf93 Attaibe Salma – Université de Lorraine**")
 st.caption("Simulation complète PV avec ombrage dynamique – Projet S8 – Juin 2025")
+
