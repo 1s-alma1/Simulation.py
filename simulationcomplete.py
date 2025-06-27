@@ -6,17 +6,17 @@ from datetime import datetime
 
 # --- CONFIGURATION ---
 st.set_page_config(page_title="Simulation Photovoltaïque Complète", layout="centered")
-st.title("☀️ Simulation Photovoltaïque Résidentielle Complète")
+st.title("\u2600\ufe0f Simulation Photovoltaïque Résidentielle Complète")
 
 st.markdown("Ce simulateur inclut le type de panneau, la météo, l'heure, le mois et les ombrages pour une étude réaliste.")
 
 # --- ENTRÉES PRINCIPALES ---
-panneau = st.selectbox("🧱 Type de panneau solaire", ["Monocristallin", "Polycristallin", "Amorphe", "Hétérojonction", "Bifacial"])
-ville = st.selectbox("🌍 Ville d'installation", ["Marseille", "Lille", "Paris", "Nice"])
-mois = st.slider("🌟 Mois de l'année", 1, 12, datetime.now().month)
-heure = st.slider("🕒 Heure de la journée", 6, 18, 12)
-meteo = st.radio("🌧️ Conditions météo", ["Ensoleillé", "Nuageux", "Pluvieux"])
-nb_panneaux = st.slider("🔢 Nombre de panneaux", 0, 25, 20)
+panneau = st.selectbox("\ud83e\uddf1 Type de panneau solaire", ["Monocristallin", "Polycristallin", "Amorphe", "Hétérojonction", "Bifacial"])
+ville = st.selectbox("\ud83c\udf0d Ville d'installation", ["Marseille", "Lille", "Paris", "Nice", "Metz", "Nancy", "Colmar", "Strasbourg", "Toulouse", "Lyon", "Bordeaux"])
+mois = st.slider("\ud83c\udf1f Mois de l'année", 1, 12, datetime.now().month)
+heure = st.slider("\ud83d\udd52 Heure de la journée", 6, 18, 12)
+meteo = st.radio("\ud83c\udf27\ufe0f Conditions météo", ["Ensoleillé", "Nuageux", "Pluvieux"])
+nb_panneaux = st.slider("\ud83d\udd22 Nombre de panneaux", 0, 25, 20)
 
 # --- DONNÉES BASES ---
 surface_par_module = 1.7
@@ -70,7 +70,7 @@ injecte = max(0, production_corrigee - autoconso)
 reprise = max(0, conso_batiment - autoconso)
 
 # --- AFFICHAGE ---
-st.subheader("🌟 Résultats de simulation")
+st.subheader("\ud83c\udf1f Résultats de simulation")
 col1, col2 = st.columns(2)
 col1.metric("Production corrigée", f"{production_corrigee:.0f} kWh/an")
 col2.metric("Puissance installée", f"{puissance_kWp:.2f} kWc")
@@ -80,15 +80,15 @@ col1.metric("Efficacité réelle", f"{efficacite:.1f} kWh/m²/an")
 col2.metric("Coût estimé", f"{cout_total:,.0f} €")
 
 st.markdown(f'''
-**🌍 Ville :** `{ville}`  
-**🌟 Mois :** `{mois}`  
-**🕒 Heure :** `{heure}h`  
-**🌧️ Météo :** `{meteo}`  
-**⚡ Perte d’ombrage estimée :** `{perte_ombrage:.1f} %`
+**\ud83c\udf0d Ville :** `{ville}`  
+**\ud83c\udf1f Mois :** `{mois}`  
+**\ud83d\udd52 Heure :** `{heure}h`  
+**\ud83c\udf27\ufe0f Météo :** `{meteo}`  
+**\u26a1 Perte d’ombrage estimée :** `{perte_ombrage:.1f} %`
 ''')
 
 # --- GRAPHIQUE ÉNERGIE ---
-st.subheader("⚡ Répartition de l’énergie")
+st.subheader("\u26a1 Répartition de l'énergie")
 fig1, ax1 = plt.subplots()
 labels = ["Autoconsommée", "Injectée", "Reprise"]
 values = [autoconso, injecte, reprise]
@@ -100,7 +100,7 @@ ax1.grid(axis='y')
 st.pyplot(fig1)
 
 # --- GRAPHIQUE PERTE HORAIRE ---
-st.subheader("🕘 Courbe des pertes d'ombrage journalières")
+st.subheader("\ud83d\udd58 Courbe des pertes d'ombrage journalières")
 heures = list(range(6, 19))
 hauteurs = [hauteur_midi * math.sin(math.pi * (h - 6) / 12) for h in heures]
 pertes = [min((angle_obstacle / 90) * 25, 25) if angle_obstacle > h else 0 for h in hauteurs]
@@ -115,5 +115,5 @@ st.pyplot(fig2)
 
 # --- SIGNATURE ---
 st.markdown("---")
-st.markdown("👩‍🎓 **Attaibe Salma – Université de Lorraine**")
+st.markdown("**\ud83d\udc69\u200d\ud83c\udf93 Attaibe Salma – Université de Lorraine**")
 st.caption("Simulation complète PV avec ombrage dynamique – Projet S8 – Juin 2025")
