@@ -25,7 +25,6 @@ puissance_kWp = nb_panneaux * puissance_par_panneau
 puissance_kWp_ref = 8
 surface_totale = nb_panneaux * surface_par_module
 facteur_meteo = {"Ensoleillé": 1.0, "Nuageux": 0.75, "Pluvieux": 0.55}[meteo]
-emoji_meteo = {"Ensoleillé": "☀️", "Nuageux": "☁️", "Pluvieux": "🌧️"}[meteo]
 
 # --- DONNÉES PAR PANNEAU ---
 data = {
@@ -71,7 +70,7 @@ injecte = max(0, production_corrigee - autoconso)
 reprise = max(0, conso_batiment - autoconso)
 
 # --- AFFICHAGE ---
-st.subheader(f"🌟 Résultats de simulation ")
+st.subheader("🌟 Résultats de simulation")
 col1, col2 = st.columns(2)
 col1.metric("Production corrigée", f"{production_corrigee:.0f} kWh/an")
 col2.metric("Puissance installée", f"{puissance_kWp:.2f} kWc")
@@ -80,14 +79,16 @@ col1, col2 = st.columns(2)
 col1.metric("Efficacité réelle", f"{efficacite:.1f} kWh/m²/an")
 col2.metric("Coût estimé", f"{cout_total:,.0f} €")
 
-st.markdown(f"\n**🌍 Ville :** `{ville}`  
+st.markdown(f'''
+**🌍 Ville :** `{ville}`  
 **🌟 Mois :** `{mois}`  
 **🕒 Heure :** `{heure}h`  
 **🌧️ Météo :** `{meteo}`  
-**⚡️ Perte d’ombrage estimée :** `{perte_ombrage:.1f} %`")
+**⚡ Perte d’ombrage estimée :** `{perte_ombrage:.1f} %`
+''')
 
 # --- GRAPHIQUE ÉNERGIE ---
-st.subheader("⚡️ Répartition de l’énergie")
+st.subheader("⚡ Répartition de l’énergie")
 fig1, ax1 = plt.subplots()
 labels = ["Autoconsommée", "Injectée", "Reprise"]
 values = [autoconso, injecte, reprise]
@@ -98,8 +99,8 @@ ax1.set_title("Répartition annuelle")
 ax1.grid(axis='y')
 st.pyplot(fig1)
 
-# --- GRAPHIQUE PERTE D'OMBRAGE SELON HEURE ---
-st.subheader("🕛 Courbe des pertes d'ombrage journalières")
+# --- GRAPHIQUE PERTE HORAIRE ---
+st.subheader("🕘 Courbe des pertes d'ombrage journalières")
 heures = list(range(6, 19))
 hauteurs = [hauteur_midi * math.sin(math.pi * (h - 6) / 12) for h in heures]
 pertes = [min((angle_obstacle / 90) * 25, 25) if angle_obstacle > h else 0 for h in hauteurs]
@@ -112,6 +113,7 @@ ax2.set_title("Variation des pertes d'ombrage dans la journée")
 ax2.grid(True)
 st.pyplot(fig2)
 
+# --- SIGNATURE ---
 st.markdown("---")
-st.markdown("**👩‍🎓 Attaibe Salma – Université de Lorraine**")
+st.markdown("👩‍🎓 **Attaibe Salma – Université de Lorraine**")
 st.caption("Simulation complète PV avec ombrage dynamique – Projet S8 – Juin 2025")
