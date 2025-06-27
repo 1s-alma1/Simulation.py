@@ -4,21 +4,21 @@ import matplotlib.pyplot as plt
 import math
 from datetime import datetime
 
-# --- CONFIGURATION ---
+# CONFIGURATION
 st.set_page_config(page_title="Simulation Photovoltaïque Complète", layout="centered")
-st.title("\u2600\ufe0f Simulation Photovoltaïque Résidentielle Complète")
+st.title("☀️ Simulation Photovoltaïque Résidentielle Complète")
 
 st.markdown("Ce simulateur inclut le type de panneau, la météo, l'heure, le mois et les ombrages pour une étude réaliste.")
 
-# --- ENTRÉES PRINCIPALES ---
-panneau = st.selectbox("\ud83e\uddf1 Type de panneau solaire", ["Monocristallin", "Polycristallin", "Amorphe", "Hétérojonction", "Bifacial"])
-ville = st.selectbox("\ud83c\udf0d Ville d'installation", ["Marseille", "Lille", "Paris", "Nice", "Metz", "Nancy", "Colmar", "Strasbourg", "Toulouse", "Lyon", "Bordeaux"])
-mois = st.slider("\ud83c\udf1f Mois de l'année", 1, 12, datetime.now().month)
-heure = st.slider("\ud83d\udd52 Heure de la journée", 6, 18, 12)
-meteo = st.radio("\ud83c\udf27\ufe0f Conditions météo", ["Ensoleillé", "Nuageux", "Pluvieux"])
-nb_panneaux = st.slider("\ud83d\udd22 Nombre de panneaux", 0, 25, 20)
+# ENTRÉES PRINCIPALES
+panneau = st.selectbox("🔧 Type de panneau solaire", ["Monocristallin", "Polycristallin", "Amorphe", "Hétérojonction", "Bifacial"])
+ville = st.selectbox("📍 Ville d'installation", ["Marseille", "Lille", "Paris", "Nice", "Metz", "Nancy", "Colmar", "Strasbourg", "Toulouse", "Lyon", "Bordeaux"])
+mois = st.slider("📅 Mois de l'année", 1, 12, datetime.now().month)
+heure = st.slider("🕒 Heure de la journée", 6, 18, 12)
+meteo = st.radio("🌦️ Conditions météo", ["Ensoleillé", "Nuageux", "Pluvieux"])
+nb_panneaux = st.slider("🔢 Nombre de panneaux", 0, 25, 20)
 
-# --- DONNÉES PAR VILLE (latitude et irradiation annuelle en kWh/m2) ---
+# DONNÉES PAR VILLE
 villes_data = {
     "Marseille": {"lat": 43.3, "irradiation": 1824},
     "Nice": {"lat": 43.7, "irradiation": 1800},
@@ -39,7 +39,7 @@ declinaison = 23.45 * math.sin(math.radians(360 / 12 * (mois - 2)))
 hauteur_midi = 90 - latitude + declinaison
 hauteur_soleil = max(0, hauteur_midi * math.sin(math.pi * (heure - 6) / 12))
 
-# --- DONNÉES PAR PANNEAU ---
+# DONNÉES PAR PANNEAU
 data = {
     "Monocristallin": {"rendement": 20.0, "prix": 1.20, "prod_ref": 11862},
     "Polycristallin": {"rendement": 17.5, "prix": 1.00, "prod_ref": 10500},
@@ -51,7 +51,7 @@ rendement = data[panneau]["rendement"]
 prod_ref = data[panneau]["prod_ref"]
 prix_watt = data[panneau]["prix"]
 
-# --- DONNÉES GÉNÉRALES ---
+# GÉNÉRALES
 surface_par_module = 1.7
 puissance_par_panneau = 0.4
 puissance_kWp = nb_panneaux * puissance_par_panneau
@@ -59,31 +59,31 @@ puissance_kWp_ref = 8
 surface_totale = nb_panneaux * surface_par_module
 facteur_meteo = {"Ensoleillé": 1.0, "Nuageux": 0.75, "Pluvieux": 0.55}[meteo]
 
-# --- OBSTACLE FIXE ---
+# OBSTACLE FIXE
 hauteur_obstacle = 8
 distance_obstacle = 10
 angle_obstacle = math.degrees(math.atan(hauteur_obstacle / distance_obstacle))
 
-# --- CALCUL PERTE D'OMBRAGE DYNAMIQUE ---
+# CALCUL PERTE D’OMBRAGE
 if angle_obstacle > hauteur_soleil:
     perte_ombrage = min((angle_obstacle / 90) * 25, 25)
 else:
     perte_ombrage = 0
 
-# --- PRODUCTION ---
+# PRODUCTION
 production = (puissance_kWp / puissance_kWp_ref) * prod_ref * (irradiation / 1824) * facteur_meteo
 production_corrigee = production * (1 - perte_ombrage / 100)
 efficacite = production_corrigee / surface_totale if surface_totale else 0
 cout_total = puissance_kWp * 1000 * prix_watt
 
-# --- CONSOMMATION & RÉPARTITION ---
+# CONSOMMATION
 conso_batiment = 8260
 autoconso = min(conso_batiment, production_corrigee) * 0.9
-injecte = max(0, production_corrigee - autoconso)
-reprise = max(0, conso_batiment - autoconso)
+injecte = max(0, production_corrigee - autoconsommation)
+reprise = max(0, conso_batiment - autoconsommation)
 
-# --- AFFICHAGE ---
-st.subheader("\ud83c\udf1f Résultats de simulation")
+# AFFICHAGE
+st.subheader("📊 Résultats de simulation")
 col1, col2 = st.columns(2)
 col1.metric("Production corrigée", f"{production_corrigee:.0f} kWh/an")
 col2.metric("Puissance installée", f"{puissance_kWp:.2f} kWc")
@@ -92,16 +92,17 @@ col1, col2 = st.columns(2)
 col1.metric("Efficacité réelle", f"{efficacite:.1f} kWh/m²/an")
 col2.metric("Coût estimé", f"{cout_total:,.0f} €")
 
-st.markdown(f'''
-**\ud83c\udf0d Ville :** `{ville}`  
-**\ud83c\udf1f Mois :** `{mois}`  
-**\ud83d\udd52 Heure :** `{heure}h`  
-**\ud83c\udf27\ufe0f Météo :** `{meteo}`  
-**\u26a1 Perte d’ombrage estimée :** `{perte_ombrage:.1f} %`
-''')
+st.markdown(f"""
+**Ville :** `{ville}`  
+**Mois :** `{mois}`  
+**Heure :** `{heure}h`  
+**Météo :** `{meteo}`  
+**Hauteur du soleil :** `{hauteur_soleil:.1f}°`  
+**Perte d’ombrage estimée :** `{perte_ombrage:.1f} %`
+""")
 
-# --- GRAPHIQUE ÉNERGIE ---
-st.subheader("\u26a1 Répartition de l'énergie")
+# GRAPHIQUE ÉNERGIE
+st.subheader("⚡ Répartition de l'énergie")
 fig1, ax1 = plt.subplots()
 labels = ["Autoconsommée", "Injectée", "Reprise"]
 values = [autoconso, injecte, reprise]
@@ -112,11 +113,12 @@ ax1.set_title("Répartition annuelle")
 ax1.grid(axis='y')
 st.pyplot(fig1)
 
-# --- GRAPHIQUE PERTE HORAIRE ---
-st.subheader("\ud83d\udd58 Courbe des pertes d'ombrage journalières")
+# COURBE DES PERTES
+st.subheader("🕒 Courbe des pertes d'ombrage journalières")
 heures = list(range(6, 19))
-hauteurs = [hauteur_midi * math.sin(math.pi * (h - 6) / 12) for h in heures]
-pertes = [min((angle_obstacle / 90) * 25, 25) if angle_obstacle > h else 0 for h in hauteurs]
+hauteurs = [max(0, hauteur_midi * math.sin(math.pi * (h - 6) / 12)) for h in heures]
+pertes = [min((angle_obstacle / 90) * 25, 25) if angle_obstacle > hs else 0 for hs in hauteurs]
+
 fig2, ax2 = plt.subplots()
 ax2.plot(heures, pertes, color='orange', linewidth=2)
 ax2.set_xticks(heures)
@@ -126,8 +128,8 @@ ax2.set_title("Variation des pertes d'ombrage dans la journée")
 ax2.grid(True)
 st.pyplot(fig2)
 
-# --- SIGNATURE ---
+# SIGNATURE
 st.markdown("---")
-st.markdown("**\ud83d\udc69\u200d\ud83c\udf93 Attaibe Salma – Université de Lorraine**")
-st.caption("Simulation complète PV avec ombrage dynamique – Projet S8 – Juin 2025")
+st.markdown("**Attaibe Salma – Université de Lorraine**")
+st.caption("Simulation dynamique PV avec ombrage – Projet S8 – Juin 2025")
 
